@@ -6,15 +6,12 @@ use Closure;
 
 final class Autoloader
 {
-    /**
-     * @var bool
-     */
-    private $registered = false;
+    private bool $registered = false;
 
     /**
      * @var array<int|string, array<string, string|null>>
      */
-    private $classIndex = [];
+    private array $classIndex = [];
 
     /**
      * Must end with \\ because some classes exists with a namespace begining by `Entity`.
@@ -25,32 +22,23 @@ final class Autoloader
     /**
      * @var string[]
      */
-    private static $class_aliases = [
+    private static array $class_aliases = [
         'Collection' => 'PrestaShopCollection',
         'Autoload' => 'PrestaShopAutoload',
         'Backup' => 'PrestaShopBackup',
         'Logger' => 'PrestaShopLogger',
     ];
 
-    /**
-     * @var string
-     */
-    private $rootDirectory;
+    private readonly string $rootDirectory;
 
     /**
      * @var array<string, bool>
      */
-    private $loadedClasses = [];
+    private array $loadedClasses = [];
 
-    /**
-     * @var bool
-     */
-    private $initialized = false;
+    private bool $initialized = false;
 
-    /**
-     * @var Closure|null
-     */
-    private $initializationCallback;
+    private ?\Closure $initializationCallback = null;
 
     public function __construct(string $directory)
     {
@@ -67,7 +55,7 @@ final class Autoloader
             throw new \RuntimeException('Autoload is already registered.');
         }
 
-        spl_autoload_register([$this, 'load']);
+        spl_autoload_register($this->load(...));
         $this->registered = true;
     }
 

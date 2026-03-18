@@ -4,25 +4,13 @@ namespace PrestaShop\Autoload;
 
 final class PrestashopAutoload
 {
-    /**
-     * @var LegacyClassLoader
-     */
-    private $classLoader;
+    private readonly \PrestaShop\Autoload\LegacyClassLoader $classLoader;
 
-    /**
-     * @var Autoloader
-     */
-    private $autoload;
+    private readonly \PrestaShop\Autoload\Autoloader $autoload;
 
-    /**
-     * @var bool
-     */
-    private $enableOverrides = true;
+    private bool $enableOverrides = true;
 
-    /**
-     * @var self
-     */
-    private static $instance;
+    private static ?\PrestaShop\Autoload\PrestashopAutoload $instance = null;
 
     public function __construct(string $rootDirectory, string $cacheDirectory)
     {
@@ -30,7 +18,7 @@ final class PrestashopAutoload
         $this->autoload = new Autoloader($rootDirectory);
 
         $this->autoload->setInitializationCallBack(
-            function () {
+            function (): void {
                 $cacheFile = $this->classLoader->getClassIndexFilepath();
                 if (is_file($cacheFile)) {
                     $this->autoload->setClassIndex($this->classLoader->loadClassCache());

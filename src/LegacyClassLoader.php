@@ -16,39 +16,27 @@ final class LegacyClassLoader
     /**
      * @var string[]
      */
-    private $coreDirectories = ['classes', 'controllers'];
+    private array $coreDirectories = ['classes', 'controllers'];
 
     /**
      * @var string[]
      */
-    private $overrideDirectories = ['override'];
+    private array $overrideDirectories = ['override'];
 
-    /**
-     * @var Filesystem
-     */
-    private $filesystem;
+    private readonly \Symfony\Component\Filesystem\Filesystem $filesystem;
 
     public const TYPE_CLASS = 'class';
     public const TYPE_ABSTRACT_CLASS = 'abstract class';
     public const TYPE_INTERFACE = 'interface';
 
-    /**
-     * @var string
-     */
-    private $rootDirectory;
+    private readonly string $rootDirectory;
 
-    /**
-     * @var string
-     */
-    private $cacheDirectory;
-
-    public function __construct(string $directory, string $cacheDirectory)
+    public function __construct(string $directory, private readonly string $cacheDirectory)
     {
         if (!str_ends_with($directory, DIRECTORY_SEPARATOR)) {
             $directory .= DIRECTORY_SEPARATOR;
         }
         $this->rootDirectory = $directory;
-        $this->cacheDirectory = $cacheDirectory;
         $this->filesystem = new Filesystem();
     }
 
@@ -94,11 +82,7 @@ final class LegacyClassLoader
     {
         // The finder cannot loop on directories that does not exist.
         // So we must check dirs before putting them in the finder
-        $directories = array_filter(array_map(function ($value) {
-            return $this->rootDirectory.$value;
-        }, $directories), static function ($directory) {
-            return is_dir($directory);
-        });
+        $directories = array_filter(array_map(fn(string $value) => $this->rootDirectory.$value, $directories), static fn(string $directory) => is_dir($directory));
 
         if ([] === $directories) {
             return [];
@@ -135,11 +119,11 @@ final class LegacyClassLoader
 
             if (preg_match($pattern, $content, $m)) {
                 $classes[$m['classname']] = [
-                    'path' => (string) substr($file->getPathname(), $rootDirStrLen),
+                    'path' => substr($file->getPathname(), $rootDirStrLen),
                     'type' => trim($m[1]),
                 ];
                 if (str_ends_with($m['classname'], self::CORE_SUFFIX)) {
-                    $classes[(string) substr($m['classname'], 0, -$coreSuffixLength)] = [
+                    $classes[substr($m['classname'], 0, -$coreSuffixLength)] = [
                         'path' => null,
                         'type' => $classes[$m['classname']]['type'],
                     ];
@@ -175,6 +159,6 @@ final class LegacyClassLoader
             return include $cacheFile;
         }
 
-        throw new \RuntimeException(__CLASS__.' has no cache file');
+        throw new \RuntimeException(self::class.' has no cache file');
     }
 }
