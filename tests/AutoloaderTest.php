@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
 use LogicException;
@@ -151,7 +153,6 @@ class AutoloaderTest extends TestCase
         }
     }
 
-
     /**
      * @dataProvider getClassIndexData
      */
@@ -171,8 +172,6 @@ class AutoloaderTest extends TestCase
 
         spl_autoload_unregister([$autoload, 'load']);
     }
-
-
 
     /**
      * @dataProvider getClassIndexData

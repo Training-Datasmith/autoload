@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PrestaShop\Autoload;
 
 use Symfony\Component\Filesystem\Filesystem;
@@ -82,7 +84,7 @@ final class LegacyClassLoader
     {
         // The finder cannot loop on directories that does not exist.
         // So we must check dirs before putting them in the finder
-        $directories = array_filter(array_map(fn(string $value) => $this->rootDirectory.$value, $directories), static fn(string $directory) => is_dir($directory));
+        $directories = array_filter(array_map(fn (string $value) => $this->rootDirectory.$value, $directories), static fn (string $directory) => is_dir($directory));
 
         if ([] === $directories) {
             return [];
